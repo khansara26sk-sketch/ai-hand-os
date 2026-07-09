@@ -1,0 +1,61 @@
+@import "tailwindcss";
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background: #070b16;
+  color: white;
+  font-family: Arial, Helvetica, sans-serif;
+}
+.ai-hover {
+  transform: scale(1.06);
+  box-shadow: 0 0 28px rgba(34, 211, 238, 0.9);
+  outline: 2px solid rgba(34, 211, 238, 0.85);
+}
+.ai-key-hover{
+    transform:scale(1.15);
+    background:#06b6d4 !important;
+    box-shadow:0 0 25px #06b6d4;
+}
+/* ===========================================
+   AI HAND OS THEMES
+=========================================== */
+
+.theme-cyan {
+  --accent: #06b6d4;
+}
+
+.theme-purple {
+  --accent: #a855f7;
+}
+
+.theme-green {
+  --accent: #22c55e;
+}
+
+.theme-cyan .bg-cyan-500,
+.theme-purple .bg-cyan-500,
+.theme-green .bg-cyan-500 {
+  background-color: var(--accent) !important;
+}
+
+.theme-cyan .text-cyan-300,
+.theme-purple .text-cyan-300,
+.theme-green .text-cyan-300 {
+  color: var(--accent) !important;
+}
+
+.theme-cyan .border-cyan-400,
+.theme-purple .border-cyan-400,
+.theme-green .border-cyan-400 {
+  border-color: var(--accent) !important;
+}
+
+.theme-cyan .shadow-cyan,
+.theme-purple .shadow-cyan,
+.theme-green .shadow-cyan {
+  box-shadow: 0 0 20px var(--accent);
+}
