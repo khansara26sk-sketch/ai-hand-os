@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { HashRouter, Routes, Route } from "react-router-dom";
 import AppLayout from "./components/Layout/AppLayout";
 import Home from "./pages/Home";
 import Mouse from "./pages/Mouse";
@@ -11,7 +11,7 @@ import PresentationDemo from "./pages/PresentationDemo";
 
 function App() {
   return (
-    <BrowserRouter>
+    <HashRouter>
       <Routes>
         <Route path="/" element={<AppLayout />}>
           <Route index element={<Home />} />
@@ -20,12 +20,11 @@ function App() {
           <Route path="canvas" element={<Canvas />} />
           <Route path="settings" element={<Settings />} />
           <Route path="about" element={<About />} />
-          <Route path="/desktop" element={<Desktop />} />
-          <Route path="/presentation-demo" element={<PresentationDemo />} />
-
+          <Route path="desktop" element={<Desktop />} />
+          <Route path="presentation-demo" element={<PresentationDemo />} />
         </Route>
       </Routes>
-    </BrowserRouter>
+    </HashRouter>
   );
 }
 

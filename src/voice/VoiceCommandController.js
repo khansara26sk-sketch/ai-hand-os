@@ -26,7 +26,6 @@ class VoiceCommandController {
 
       this.transcript = text;
       this.message = `Heard: ${text}`;
-
       this.handleCommand(text);
     };
 
@@ -35,6 +34,10 @@ class VoiceCommandController {
         this.recognition.start();
       }
     };
+  }
+
+  navigate(path) {
+    window.location.hash = path;
   }
 
   start() {
@@ -60,20 +63,39 @@ class VoiceCommandController {
   }
 
   handleCommand(text) {
-    if (text.includes("open canvas")) {
-      window.location.href = "/canvas";
-    }
-
-    if (text.includes("open keyboard")) {
-      window.location.href = "/keyboard";
+    if (text.includes("open dashboard") || text.includes("open home")) {
+      this.navigate("/");
+      this.message = "Opening dashboard";
     }
 
     if (text.includes("open mouse")) {
-      window.location.href = "/mouse";
+      this.navigate("/mouse");
+      this.message = "Opening mouse";
     }
 
-    if (text.includes("open dashboard")) {
-      window.location.href = "/";
+    if (text.includes("open keyboard")) {
+      this.navigate("/keyboard");
+      this.message = "Opening keyboard";
+    }
+
+    if (text.includes("open canvas")) {
+      this.navigate("/canvas");
+      this.message = "Opening canvas";
+    }
+
+    if (text.includes("open settings")) {
+      this.navigate("/settings");
+      this.message = "Opening settings";
+    }
+
+    if (text.includes("open about")) {
+      this.navigate("/about");
+      this.message = "Opening about";
+    }
+
+    if (text.includes("open presentation")) {
+      this.navigate("/presentation-demo");
+      this.message = "Opening presentation";
     }
 
     if (text.includes("clear canvas")) {
@@ -84,6 +106,10 @@ class VoiceCommandController {
     if (text.includes("save canvas")) {
       document.querySelector("[data-save-canvas='true']")?.click();
       this.message = "Canvas saved";
+    }
+
+    if (text.includes("stop listening") || text.includes("stop voice")) {
+      this.stop();
     }
   }
 
