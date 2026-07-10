@@ -417,114 +417,153 @@ function AirCanvas() {
   }, []);
 
   return (
-    <div className="w-full h-full p-4 rounded-2xl bg-white/5 border border-white/10 overflow-auto">
-      <div className="flex items-center justify-between gap-4 mb-4">
-        <h2 className="text-2xl font-bold whitespace-nowrap">Air Canvas</h2>
+    <section className="w-full rounded-2xl border border-white/10 bg-white/5 p-3 sm:p-4 md:p-6 overflow-hidden">
+      <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <div className="min-w-0">
+          <h2 className="text-xl sm:text-2xl font-bold">Air Canvas</h2>
+          <p className="mt-1 text-xs sm:text-sm text-gray-500">
+            Pinch and move to draw. Choose a tool, color and brush size below.
+          </p>
+        </div>
 
-        <div className="flex gap-3">
+        <div className="grid grid-cols-2 sm:flex gap-2 sm:gap-3 w-full sm:w-auto">
           <button
+            type="button"
             data-ai-clickable="true"
             onClick={undo}
             disabled={historyCount === 0}
-            className="px-5 py-2 rounded-xl bg-white/10 border border-white/10 text-white disabled:opacity-40"
+            className="min-h-11 rounded-xl border border-white/10 bg-white/10 px-3 sm:px-4 py-2 text-sm sm:text-base text-white transition active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-40"
           >
             Undo
           </button>
 
           <button
+            type="button"
             data-ai-clickable="true"
             onClick={redo}
             disabled={redoCount === 0}
-            className="px-5 py-2 rounded-xl bg-white/10 border border-white/10 text-white disabled:opacity-40"
+            className="min-h-11 rounded-xl border border-white/10 bg-white/10 px-3 sm:px-4 py-2 text-sm sm:text-base text-white transition active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-40"
           >
             Redo
           </button>
 
           <button
+            type="button"
             data-ai-clickable="true"
             data-save-canvas="true"
             onClick={savePNG}
-            className="px-5 py-2 rounded-xl bg-green-500/20 border border-green-400/40 text-green-300"
+            className="min-h-11 rounded-xl border border-green-400/40 bg-green-500/20 px-3 sm:px-4 py-2 text-sm sm:text-base text-green-300 transition active:scale-[0.98]"
           >
             Save PNG
           </button>
 
           <button
+            type="button"
             data-ai-clickable="true"
             onClick={clearCanvas}
-            className="px-5 py-2 rounded-xl bg-red-500/20 border border-red-400/40 text-red-300"
+            className="min-h-11 rounded-xl border border-red-400/40 bg-red-500/20 px-3 sm:px-4 py-2 text-sm sm:text-base text-red-300 transition active:scale-[0.98]"
           >
             Clear
           </button>
         </div>
       </div>
 
-      <div className="mb-4 flex flex-wrap items-center gap-4">
-        <div className="flex gap-2">
-          {colors.map((c) => (
-            <button
-              key={c}
-              data-ai-clickable="true"
-              onClick={() => changeColor(c)}
-              className={`w-10 h-10 rounded-full border-2 transition-all ${
-                color === c && tool === "brush"
-                  ? "border-white scale-110"
-                  : "border-white/20"
-              }`}
-              style={{ backgroundColor: c }}
-            />
-          ))}
+      <div className="mb-4 space-y-3 rounded-2xl border border-white/10 bg-black/20 p-3 sm:p-4">
+        <div>
+          <p className="mb-2 text-xs uppercase tracking-[0.16em] text-gray-500">
+            Colors
+          </p>
+
+          <div className="flex gap-2 overflow-x-auto pb-1">
+            {colors.map((currentColor) => (
+              <button
+                type="button"
+                key={currentColor}
+                data-ai-clickable="true"
+                aria-label={`Choose color ${currentColor}`}
+                onClick={() => changeColor(currentColor)}
+                className={`h-9 w-9 sm:h-10 sm:w-10 shrink-0 rounded-full border-2 transition-all active:scale-95 ${
+                  color === currentColor && tool === "brush"
+                    ? "scale-110 border-white shadow-[0_0_14px_rgba(255,255,255,0.35)]"
+                    : "border-white/20"
+                }`}
+                style={{ backgroundColor: currentColor }}
+              />
+            ))}
+          </div>
         </div>
 
-        <div className="flex gap-2">
-          {sizes.map((s) => (
-            <button
-              key={s}
-              data-ai-clickable="true"
-              onClick={() => changeSize(s)}
-              className={`px-4 py-2 rounded-xl border transition ${
-                size === s
-                  ? "bg-cyan-500/30 border-cyan-300 text-cyan-200"
-                  : "bg-white/10 border-white/10 text-white"
-              }`}
-            >
-              {s}px
-            </button>
-          ))}
+        <div>
+          <p className="mb-2 text-xs uppercase tracking-[0.16em] text-gray-500">
+            Brush size
+          </p>
+
+          <div className="flex gap-2 overflow-x-auto pb-1">
+            {sizes.map((currentSize) => (
+              <button
+                type="button"
+                key={currentSize}
+                data-ai-clickable="true"
+                onClick={() => changeSize(currentSize)}
+                className={`min-h-10 shrink-0 rounded-xl border px-3 sm:px-4 py-2 text-sm transition active:scale-[0.98] ${
+                  size === currentSize
+                    ? "border-cyan-300 bg-cyan-500/30 text-cyan-200"
+                    : "border-white/10 bg-white/10 text-white"
+                }`}
+              >
+                {currentSize}px
+              </button>
+            ))}
+          </div>
         </div>
 
-        {[
-          ["brush", "Brush"],
-          ["eraser", "Eraser"],
-          ["line", "Line"],
-          ["rectangle", "Rectangle"],
-          ["square", "Square"],
-          ["circle", "Circle"],
-          ["ellipse", "Oval"],
-          ["triangle", "Triangle"],
-        ].map(([value, label]) => (
-          <button
-            key={value}
-            data-ai-clickable="true"
-            onClick={() => changeTool(value)}
-            className={`px-5 py-2 rounded-xl border transition ${
-              tool === value
-                ? value === "eraser"
-                  ? "bg-red-500/30 border-red-300 text-red-200"
-                  : "bg-cyan-500/30 border-cyan-300 text-cyan-200"
-                : "bg-white/10 border-white/10 text-white"
-            }`}
-          >
-            {label}
-          </button>
-        ))}
+        <div>
+          <p className="mb-2 text-xs uppercase tracking-[0.16em] text-gray-500">
+            Tools
+          </p>
+
+          <div className="flex gap-2 overflow-x-auto pb-1">
+            {[
+              ["brush", "Brush"],
+              ["eraser", "Eraser"],
+              ["line", "Line"],
+              ["rectangle", "Rectangle"],
+              ["square", "Square"],
+              ["circle", "Circle"],
+              ["ellipse", "Oval"],
+              ["triangle", "Triangle"],
+            ].map(([value, label]) => (
+              <button
+                type="button"
+                key={value}
+                data-ai-clickable="true"
+                onClick={() => changeTool(value)}
+                className={`min-h-10 shrink-0 rounded-xl border px-3 sm:px-4 py-2 text-sm transition active:scale-[0.98] ${
+                  tool === value
+                    ? value === "eraser"
+                      ? "border-red-300 bg-red-500/30 text-red-200"
+                      : "border-cyan-300 bg-cyan-500/30 text-cyan-200"
+                    : "border-white/10 bg-white/10 text-white"
+                }`}
+              >
+                {label}
+              </button>
+            ))}
+          </div>
+        </div>
       </div>
 
-      <canvas
-        ref={canvasRef}
-        className="block w-full h-[420px] rounded-xl bg-black/40 border border-cyan-400/40"
-      />
-    </div>
+      <div className="relative overflow-hidden rounded-xl border border-cyan-400/40 bg-black/40">
+        <canvas
+          ref={canvasRef}
+          className="block h-[300px] w-full touch-none sm:h-[380px] md:h-[460px] lg:h-[540px]"
+        />
+
+        <div className="pointer-events-none absolute bottom-3 left-3 rounded-full border border-white/10 bg-black/55 px-3 py-1.5 text-[10px] sm:text-xs text-gray-300 backdrop-blur-md">
+          {tool === "eraser" ? "Eraser" : tool} • {size}px
+        </div>
+      </div>
+    </section>
   );
 }
 

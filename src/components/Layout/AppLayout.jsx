@@ -21,38 +21,42 @@ function AppLayout() {
   const screenshotHUD = useScreenshotHUD();
   const { settings } = useAppSettings();
 
-  const themeClass =
-    settings.theme === "purple"
-      ? "theme-purple"
-      : settings.theme === "green"
-      ? "theme-green"
-      : "theme-cyan";
+  const activeTheme = settings?.theme || "cyan";
 
   return (
-    <div className={`min-h-screen bg-[#070b16] text-white flex ${themeClass}`}>
-      <VolumeHUD visible={volumeHUD.visible} volume={volumeHUD.volume} />
+    <div
+      className={`min-h-screen min-h-[100dvh] bg-[#070b16] text-white flex theme-${activeTheme}`}
+    >
+      {/* Global HUD overlays */}
+      <VolumeHUD
+        visible={Boolean(volumeHUD?.visible)}
+        volume={volumeHUD?.volume ?? 50}
+      />
 
       <BrightnessHUD
-        visible={brightnessHUD.visible}
-        brightness={brightnessHUD.brightness}
+        visible={Boolean(brightnessHUD?.visible)}
+        brightness={brightnessHUD?.brightness ?? 50}
       />
 
       <ScreenshotHUD
-        visible={screenshotHUD.visible}
-        countdown={screenshotHUD.countdown}
-        flash={screenshotHUD.flash}
-        message={screenshotHUD.message}
+        visible={Boolean(screenshotHUD?.visible)}
+        countdown={screenshotHUD?.countdown ?? null}
+        flash={Boolean(screenshotHUD?.flash)}
+        message={screenshotHUD?.message || ""}
       />
 
       <VoiceHUD />
+
       <PresentationHUD />
 
+      {/* Desktop sidebar + mobile bottom navigation */}
       <Sidebar />
 
-      <div className="flex-1 flex flex-col min-w-0">
+      {/* Main application area */}
+      <div className="flex-1 min-w-0 flex flex-col pb-20 md:pb-0">
         <Navbar />
 
-        <main className="flex-1 p-6 overflow-y-auto">
+        <main className="flex-1 min-w-0 overflow-y-auto overflow-x-hidden p-4 sm:p-5 md:p-6">
           <Outlet />
         </main>
 

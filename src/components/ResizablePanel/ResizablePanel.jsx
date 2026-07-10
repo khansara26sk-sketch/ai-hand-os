@@ -1,24 +1,52 @@
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
-function ResizablePanel({ children, defaultWidth = 720, defaultHeight = null }) {
+function ResizablePanel({
+  children,
+  defaultWidth = 720,
+  defaultHeight = null,
+}) {
   const panelRef = useRef(null);
   const resizingRef = useRef(false);
-  const startRef = useRef({ x: 0, y: 0, width: 0, height: 0 });
+
+  const startRef = useRef({
+    x: 0,
+    y: 0,
+    width: 0,
+    height: 0,
+  });
+
+  const [isMobile, setIsMobile] = useState(
+    window.innerWidth < 768
+  );
 
   const [size, setSize] = useState({
     width: defaultWidth,
     height: defaultHeight,
   });
 
-  const startResize = (e) => {
-    e.preventDefault();
+  useEffect(() => {
+    const onResize = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+
+    window.addEventListener("resize", onResize);
+
+    return () =>
+      window.removeEventListener("resize", onResize);
+  }, []);
+
+  const startResize = (event) => {
+    if (isMobile) return;
+
+    event.preventDefault();
 
     const rect = panelRef.current.getBoundingClientRect();
 
     resizingRef.current = true;
+
     startRef.current = {
-      x: e.clientX,
-      y: e.clientY,
+      x: event.clientX,
+      y: event.clientY,
       width: rect.width,
       height: rect.height,
     };
@@ -27,18 +55,27 @@ function ResizablePanel({ children, defaultWidth = 720, defaultHeight = null }) 
     window.addEventListener("mouseup", stopResize);
   };
 
-  const resize = (e) => {
+  const resize = (event) => {
     if (!resizingRef.current) return;
 
-    const dx = e.clientX - startRef.current.x;
-    const dy = e.clientY - startRef.current.y;
+    const dx = event.clientX - startRef.current.x;
+    const dy = event.clientY - startRef.current.y;
+
+    const maxWidth = window.innerWidth - 80;
 
     setSize({
-      width: Math.max(360, startRef.current.width + dx),
+      width: Math.min(
+        Math.max(360, startRef.current.width + dx),
+        maxWidth
+      ),
+
       height:
         defaultHeight === null
           ? null
-          : Math.max(260, startRef.current.height + dy),
+          : Math.max(
+              260,
+              startRef.current.height + dy
+            ),
     });
   };
 
@@ -52,20 +89,42 @@ function ResizablePanel({ children, defaultWidth = 720, defaultHeight = null }) 
   return (
     <div
       ref={panelRef}
-      className="relative"
+      className="relative w-full"
       style={{
-        width: `${size.width}px`,
-        height: size.height ? `${size.height}px` : "auto",
+        width: isMobile
+          ? "100%"
+          : `${size.width}px`,
+
+        height:
+          defaultHeight && !isMobile
+            ? `${size.height}px`
+            : "auto",
+
         maxWidth: "100%",
       }}
     >
       {children}
 
-      <div
-        data-ai-clickable="true"
-        onMouseDown={startResize}
-        className="absolute bottom-2 right-2 z-[9999] h-6 w-6 cursor-se-resize rounded-md bg-cyan-400/70 shadow-[0_0_20px_#22d3ee]"
-      />
+      {!isMobile && (
+        <div
+          data-ai-clickable="true"
+          onMouseDown={startResize}
+          className="
+            absolute
+            bottom-2
+            right-2
+            z-[9999]
+            h-6
+            w-6
+            cursor-se-resize
+            rounded-md
+            bg-cyan-400/70
+            shadow-[0_0_20px_#22d3ee]
+            hover:scale-110
+            transition
+          "
+        />
+      )}
     </div>
   );
 }

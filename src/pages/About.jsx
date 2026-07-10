@@ -4,12 +4,12 @@ import handEngine from "../engine/HandEngine";
 function About() {
   const [system, setSystem] = useState({
     fps: 0,
-    gesture: "None",
+    gesture: "none",
     hand: false,
   });
 
   useEffect(() => {
-    const id = setInterval(() => {
+    const intervalId = setInterval(() => {
       setSystem({
         fps: handEngine.getFPS(),
         gesture: handEngine.getGesture(),
@@ -17,18 +17,18 @@ function About() {
       });
     }, 100);
 
-    return () => clearInterval(id);
+    return () => clearInterval(intervalId);
   }, []);
 
   const modules = [
-    "Virtual Mouse",
-    "Virtual Keyboard",
-    "Air Canvas",
-    "Volume Control",
-    "Brightness Control",
-    "Voice Commands",
-    "Presentation Mode",
-    "Screenshot",
+    { name: "Virtual Mouse", icon: "🖱️" },
+    { name: "Virtual Keyboard", icon: "⌨️" },
+    { name: "Air Canvas", icon: "🎨" },
+    { name: "Volume Control", icon: "🔊" },
+    { name: "Brightness Control", icon: "☀️" },
+    { name: "Voice Commands", icon: "🎤" },
+    { name: "Presentation Mode", icon: "🖥️" },
+    { name: "Screenshot", icon: "📸" },
   ];
 
   const roadmap = [
@@ -52,166 +52,173 @@ function About() {
   ];
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-6 md:space-y-8 pb-6">
+      <section className="relative overflow-hidden rounded-2xl md:rounded-3xl bg-white/5 border border-cyan-400/20 p-5 sm:p-7 md:p-10 shadow-xl">
+        <div className="absolute -top-20 -right-16 w-52 h-52 rounded-full bg-cyan-400/10 blur-3xl pointer-events-none" />
 
-      {/* Hero */}
+        <div className="relative">
+          <p className="text-xs sm:text-sm uppercase tracking-[0.25em] text-cyan-300">
+            About the Project
+          </p>
 
-      <div className="rounded-3xl bg-white/5 border border-cyan-400/20 p-10 shadow-xl">
+          <h1 className="mt-3 text-3xl sm:text-4xl md:text-5xl font-black leading-tight">
+            AI Hand OS
+          </h1>
 
-        <h1 className="text-5xl font-black">
-          AI Hand OS
-        </h1>
+          <p className="mt-3 text-base sm:text-lg md:text-xl text-cyan-300">
+            Gesture-Controlled Operating System
+          </p>
 
-        <p className="text-cyan-300 mt-3 text-xl">
-          Gesture Controlled Operating System
-        </p>
+          <p className="mt-4 max-w-3xl text-sm sm:text-base text-gray-400 leading-relaxed">
+            A browser-based interaction platform that combines hand tracking,
+            voice commands and real-time gesture controls in one interface.
+          </p>
 
-        <div className="mt-6 inline-flex px-5 py-2 rounded-full bg-green-500/20 border border-green-400/40 text-green-300">
-          Version 1.0
+          <div className="mt-5 sm:mt-6 flex flex-wrap gap-2 sm:gap-3">
+            <span className="inline-flex px-4 py-2 rounded-full bg-green-500/20 border border-green-400/40 text-green-300 text-xs sm:text-sm">
+              Version 1.0
+            </span>
+
+            <span className="inline-flex px-4 py-2 rounded-full bg-cyan-500/10 border border-cyan-400/30 text-cyan-300 text-xs sm:text-sm">
+              Browser Edition
+            </span>
+          </div>
         </div>
+      </section>
 
-      </div>
+      <section className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4 md:gap-5">
+        <article className="rounded-2xl bg-white/5 border border-white/10 p-5 md:p-6">
+          <p className="text-sm text-gray-400">Tracking FPS</p>
 
-      {/* Live Status */}
+          <div className="mt-3 flex items-end gap-2">
+            <h2 className="text-3xl md:text-5xl font-bold text-cyan-300">
+              {system.fps || "--"}
+            </h2>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+            <span className="mb-1 text-xs sm:text-sm text-gray-500">
+              frames/sec
+            </span>
+          </div>
+        </article>
 
-        <div className="rounded-2xl bg-white/5 border border-white/10 p-6">
-          <p className="text-gray-400">FPS</p>
+        <article className="rounded-2xl bg-white/5 border border-white/10 p-5 md:p-6">
+          <p className="text-sm text-gray-400">Current Gesture</p>
 
-          <h2 className="text-5xl font-bold text-cyan-300 mt-3">
-            {system.fps}
+          <h2 className="mt-3 text-2xl md:text-3xl font-bold text-cyan-300 capitalize break-words">
+            {system.gesture || "none"}
           </h2>
-        </div>
+        </article>
 
-        <div className="rounded-2xl bg-white/5 border border-white/10 p-6">
-          <p className="text-gray-400">Current Gesture</p>
+        <article className="rounded-2xl bg-white/5 border border-white/10 p-5 md:p-6 sm:col-span-2 xl:col-span-1">
+          <div className="flex items-center justify-between gap-3">
+            <p className="text-sm text-gray-400">Tracking Status</p>
 
-          <h2 className="text-2xl font-bold text-cyan-300 mt-3">
-            {system.gesture}
-          </h2>
-        </div>
-
-        <div className="rounded-2xl bg-white/5 border border-white/10 p-6">
-          <p className="text-gray-400">Camera</p>
+            <span
+              className={`w-3 h-3 rounded-full ${
+                system.hand
+                  ? "bg-green-400 shadow-[0_0_10px_rgba(74,222,128,0.8)]"
+                  : "bg-red-500"
+              }`}
+            />
+          </div>
 
           <h2
-            className={`text-2xl font-bold mt-3 ${
+            className={`mt-3 text-2xl md:text-3xl font-bold ${
               system.hand ? "text-green-300" : "text-red-300"
             }`}
           >
             {system.hand ? "ONLINE" : "OFFLINE"}
           </h2>
-        </div>
+        </article>
+      </section>
 
-      </div>
-
-      {/* Features */}
-
-      <div>
-
-        <h2 className="text-3xl font-bold mb-5">
+      <section>
+        <h2 className="text-2xl md:text-3xl font-bold mb-4 md:mb-5">
           Enabled Modules
         </h2>
 
-        <div className="grid md:grid-cols-2 xl:grid-cols-4 gap-4">
-
+        <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-3 md:gap-4">
           {modules.map((module) => (
-            <div
-              key={module}
-              className="rounded-2xl bg-white/5 border border-white/10 p-5"
+            <article
+              key={module.name}
+              className="min-w-0 rounded-2xl bg-white/5 border border-white/10 p-4 sm:p-5"
             >
-              <div className="text-green-400 text-2xl mb-3">
-                ✔
+              <div className="flex items-start justify-between gap-2">
+                <span className="text-2xl sm:text-3xl">{module.icon}</span>
+
+                <span className="text-green-400 text-sm">✔</span>
               </div>
 
-              <h3 className="font-semibold">
-                {module}
+              <h3 className="mt-3 text-sm sm:text-base font-semibold leading-snug">
+                {module.name}
               </h3>
-            </div>
+            </article>
           ))}
-
         </div>
+      </section>
 
-      </div>
-
-      {/* Tech */}
-
-      <div>
-
-        <h2 className="text-3xl font-bold mb-5">
+      <section>
+        <h2 className="text-2xl md:text-3xl font-bold mb-4 md:mb-5">
           Technology Stack
         </h2>
 
-        <div className="grid md:grid-cols-2 xl:grid-cols-4 gap-4">
-
+        <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-3 md:gap-4">
           {tech.map((item) => (
-            <div
+            <article
               key={item}
-              className="rounded-2xl bg-cyan-500/10 border border-cyan-400/20 p-5 text-center"
+              className="rounded-2xl bg-cyan-500/10 border border-cyan-400/20 p-4 sm:p-5 text-center text-sm sm:text-base"
             >
               {item}
-            </div>
+            </article>
           ))}
-
         </div>
+      </section>
 
-      </div>
-
-      {/* Roadmap */}
-
-      <div>
-
-        <h2 className="text-3xl font-bold mb-5">
+      <section>
+        <h2 className="text-2xl md:text-3xl font-bold mb-4 md:mb-5">
           Upcoming Features
         </h2>
 
-        <div className="grid md:grid-cols-2 gap-4">
-
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-4">
           {roadmap.map((item) => (
-            <div
+            <article
               key={item.title}
-              className="rounded-2xl bg-white/5 border border-white/10 p-5 flex justify-between"
+              className="rounded-2xl bg-white/5 border border-white/10 p-4 sm:p-5 flex items-center justify-between gap-3"
             >
-              <span>{item.title}</span>
+              <span className="text-sm sm:text-base">{item.title}</span>
 
               <span
                 className={
-                  item.done
-                    ? "text-green-400"
-                    : "text-yellow-300"
+                  item.done ? "text-green-400" : "text-yellow-300"
                 }
               >
                 {item.done ? "✔" : "⏳"}
               </span>
-            </div>
+            </article>
           ))}
-
         </div>
+      </section>
 
-      </div>
+      <section className="rounded-2xl md:rounded-3xl bg-gradient-to-r from-cyan-500/20 to-blue-500/20 border border-cyan-400/20 p-5 sm:p-7 md:p-10">
+        <p className="text-xs sm:text-sm uppercase tracking-[0.2em] text-gray-400">
+          Developer
+        </p>
 
-      {/* Developer */}
-
-      <div className="rounded-3xl bg-gradient-to-r from-cyan-500/20 to-blue-500/20 border border-cyan-400/20 p-10">
-
-        <h2 className="text-4xl font-bold">
+        <h2 className="mt-2 text-2xl sm:text-3xl md:text-4xl font-bold">
           Developed By
         </h2>
 
-        <p className="text-cyan-300 text-2xl mt-3">
+        <p className="mt-3 text-xl sm:text-2xl text-cyan-300">
           Sara Khan
         </p>
 
-        <p className="text-gray-400 mt-4 max-w-3xl">
-          AI Hand OS is a real-time gesture-controlled operating
-          system built using React, MediaPipe Hands and modern web
-          technologies. It demonstrates computer interaction through
-          hand gestures, voice commands and AI-powered controls.
+        <p className="mt-4 max-w-3xl text-sm sm:text-base text-gray-400 leading-relaxed">
+          AI Hand OS is a real-time gesture-controlled interface built with
+          React, MediaPipe Hands and modern browser APIs. It demonstrates mouse
+          control, virtual typing, drawing, screenshots, system HUDs, voice
+          navigation and presentation controls through hand gestures.
         </p>
-
-      </div>
-
+      </section>
     </div>
   );
 }

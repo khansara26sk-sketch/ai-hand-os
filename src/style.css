@@ -1,40 +1,146 @@
 @import "tailwindcss";
 
-* {
+/* ===========================================
+   BASE RESET
+=========================================== */
+
+:root {
+  color-scheme: dark;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+*,
+*::before,
+*::after {
   box-sizing: border-box;
 }
 
-body {
-  margin: 0;
+html {
+  width: 100%;
+  min-height: 100%;
   background: #070b16;
-  color: white;
-  font-family: Arial, Helvetica, sans-serif;
+  scroll-behavior: smooth;
+  overflow-x: hidden;
 }
+
+body {
+  width: 100%;
+  min-height: 100vh;
+  min-height: 100dvh;
+  margin: 0;
+  overflow-x: hidden;
+  background: #070b16;
+  color: #ffffff;
+  font-family:
+    Inter,
+    ui-sans-serif,
+    system-ui,
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    Arial,
+    Helvetica,
+    sans-serif;
+}
+
+#root {
+  width: 100%;
+  min-height: 100vh;
+  min-height: 100dvh;
+  overflow-x: hidden;
+}
+
+img,
+video,
+canvas,
+svg {
+  display: block;
+  max-width: 100%;
+}
+
+button,
+input,
+select,
+textarea {
+  font: inherit;
+}
+
+button,
+a,
+input,
+label,
+select {
+  -webkit-tap-highlight-color: transparent;
+}
+
+button,
+a,
+label {
+  touch-action: manipulation;
+}
+
+button:focus-visible,
+a:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible {
+  outline: 2px solid var(--accent, #06b6d4);
+  outline-offset: 3px;
+}
+
+/* ===========================================
+   AI INTERACTION STATES
+=========================================== */
+
 .ai-hover {
   transform: scale(1.06);
-  box-shadow: 0 0 28px rgba(34, 211, 238, 0.9);
-  outline: 2px solid rgba(34, 211, 238, 0.85);
+  outline: 2px solid var(--accent, rgba(34, 211, 238, 0.85));
+  box-shadow: 0 0 28px color-mix(in srgb, var(--accent, #22d3ee) 85%, transparent);
+  transition:
+    transform 120ms ease,
+    box-shadow 120ms ease,
+    outline-color 120ms ease;
 }
-.ai-key-hover{
-    transform:scale(1.15);
-    background:#06b6d4 !important;
-    box-shadow:0 0 25px #06b6d4;
+
+.ai-key-hover {
+  transform: scale(1.12);
+  background: var(--accent, #06b6d4) !important;
+  box-shadow: 0 0 25px color-mix(in srgb, var(--accent, #06b6d4) 90%, transparent);
+  transition:
+    transform 120ms ease,
+    background-color 120ms ease,
+    box-shadow 120ms ease;
 }
+
 /* ===========================================
    AI HAND OS THEMES
 =========================================== */
 
 .theme-cyan {
   --accent: #06b6d4;
+  --accent-soft: rgba(6, 182, 212, 0.18);
+  --accent-border: rgba(34, 211, 238, 0.45);
+  --accent-glow: rgba(34, 211, 238, 0.4);
 }
 
 .theme-purple {
   --accent: #a855f7;
+  --accent-soft: rgba(168, 85, 247, 0.18);
+  --accent-border: rgba(192, 132, 252, 0.45);
+  --accent-glow: rgba(168, 85, 247, 0.4);
 }
 
 .theme-green {
   --accent: #22c55e;
+  --accent-soft: rgba(34, 197, 94, 0.18);
+  --accent-border: rgba(74, 222, 128, 0.45);
+  --accent-glow: rgba(34, 197, 94, 0.4);
 }
+
+/* Tailwind cyan overrides */
 
 .theme-cyan .bg-cyan-500,
 .theme-purple .bg-cyan-500,
@@ -42,20 +148,186 @@ body {
   background-color: var(--accent) !important;
 }
 
+.theme-cyan .bg-cyan-500\/10,
+.theme-purple .bg-cyan-500\/10,
+.theme-green .bg-cyan-500\/10 {
+  background-color: var(--accent-soft) !important;
+}
+
+.theme-cyan .bg-cyan-500\/20,
+.theme-purple .bg-cyan-500\/20,
+.theme-green .bg-cyan-500\/20 {
+  background-color: var(--accent-soft) !important;
+}
+
+.theme-cyan .bg-cyan-500\/30,
+.theme-purple .bg-cyan-500\/30,
+.theme-green .bg-cyan-500\/30 {
+  background-color: color-mix(in srgb, var(--accent) 28%, transparent) !important;
+}
+
+.theme-cyan .text-cyan-200,
+.theme-purple .text-cyan-200,
+.theme-green .text-cyan-200,
 .theme-cyan .text-cyan-300,
 .theme-purple .text-cyan-300,
 .theme-green .text-cyan-300 {
   color: var(--accent) !important;
 }
 
+.theme-cyan .border-cyan-300,
+.theme-purple .border-cyan-300,
+.theme-green .border-cyan-300,
 .theme-cyan .border-cyan-400,
 .theme-purple .border-cyan-400,
 .theme-green .border-cyan-400 {
-  border-color: var(--accent) !important;
+  border-color: var(--accent-border) !important;
 }
 
 .theme-cyan .shadow-cyan,
 .theme-purple .shadow-cyan,
 .theme-green .shadow-cyan {
-  box-shadow: 0 0 20px var(--accent);
+  box-shadow: 0 0 20px var(--accent-glow);
+}
+
+.theme-cyan .accent-cyan-400,
+.theme-purple .accent-cyan-400,
+.theme-green .accent-cyan-400 {
+  accent-color: var(--accent);
+}
+
+/* ===========================================
+   RESPONSIVE LAYOUT HELPERS
+=========================================== */
+
+.app-screen {
+  min-height: 100vh;
+  min-height: 100dvh;
+}
+
+.mobile-safe-bottom {
+  padding-bottom: max(0px, env(safe-area-inset-bottom));
+}
+
+.mobile-safe-top {
+  padding-top: max(0px, env(safe-area-inset-top));
+}
+
+.safe-inline {
+  padding-left: max(1rem, env(safe-area-inset-left));
+  padding-right: max(1rem, env(safe-area-inset-right));
+}
+
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+.touch-scroll {
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
+}
+
+/* ===========================================
+   SCROLLBARS
+=========================================== */
+
+* {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(148, 163, 184, 0.45) rgba(255, 255, 255, 0.04);
+}
+
+*::-webkit-scrollbar {
+  width: 9px;
+  height: 9px;
+}
+
+*::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.04);
+}
+
+*::-webkit-scrollbar-thumb {
+  background: rgba(148, 163, 184, 0.38);
+  border: 2px solid transparent;
+  border-radius: 999px;
+  background-clip: padding-box;
+}
+
+*::-webkit-scrollbar-thumb:hover {
+  background: color-mix(in srgb, var(--accent, #06b6d4) 65%, transparent);
+  border: 2px solid transparent;
+  background-clip: padding-box;
+}
+
+/* ===========================================
+   FORM CONTROLS
+=========================================== */
+
+input[type="range"] {
+  min-height: 32px;
+}
+
+input[type="range"]::-webkit-slider-thumb {
+  cursor: pointer;
+}
+
+input[type="range"]::-moz-range-thumb {
+  cursor: pointer;
+}
+
+input[type="file"] {
+  max-width: 100%;
+}
+
+/* ===========================================
+   MOBILE POLISH
+=========================================== */
+
+@media (max-width: 767px) {
+  body {
+    overscroll-behavior-y: none;
+  }
+
+  button,
+  a,
+  label {
+    min-height: 44px;
+  }
+
+  input[type="range"] {
+    min-height: 44px;
+  }
+
+  .ai-hover {
+    transform: scale(1.03);
+  }
+
+  .ai-key-hover {
+    transform: scale(1.06);
+  }
+}
+
+@media (max-width: 380px) {
+  body {
+    font-size: 15px;
+  }
+}
+
+/* ===========================================
+   REDUCED MOTION
+=========================================== */
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
 }
