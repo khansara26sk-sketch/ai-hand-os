@@ -90,39 +90,39 @@ function HandTracker({ videoRef, enableCursor = false, mirrorMode = true }) {
   }
 
   return (
-    <div
-      data-hand-overlay="true"
-      className="absolute inset-0 pointer-events-none z-10"
-    >
-      <canvas
-  ref={canvasRef}
-  className={`w-full h-full ${
-    settings.showLandmarks ? "opacity-100" : "opacity-0"
-  } ${mirrorMode ? "scale-x-[-1]" : ""}`}
-/>
+<div
+  data-hand-overlay="true"
+  className="absolute inset-0 pointer-events-none z-10 overflow-hidden"
+>
+  <canvas
+    ref={canvasRef}
+    className={`absolute inset-0 w-full h-full object-contain ${
+      settings.showLandmarks ? "opacity-100" : "opacity-0"
+    } ${mirrorMode ? "scale-x-[-1]" : ""}`}
+  />
 
-      {enableCursor && isHandDetected && (
-        <VirtualCursor
-          x={cursorPosition.x}
-          y={cursorPosition.y}
-          isClicking={clicking}
-        />
-      )}
+  {enableCursor && isHandDetected && (
+    <VirtualCursor
+      x={cursorPosition.x}
+      y={cursorPosition.y}
+      isClicking={clicking}
+    />
+  )}
 
-      <div
-        className={`absolute top-3 left-3 px-3 py-1.5 rounded-full text-sm border backdrop-blur-md ${
-          isHandDetected
-            ? "bg-green-500/20 border-green-400/40 text-green-300"
-            : "bg-white/10 border-white/20 text-gray-300"
-        }`}
-      >
-        {isHandDetected
-          ? clicking
-            ? `🤏 Pinch Click • ${fps} FPS`
-            : `🖐 Hand Detected • ${fps} FPS`
-          : "Waiting for Hand..."}
-      </div>
-    </div>
+  <div
+    className={`absolute top-3 left-3 px-3 py-1.5 rounded-full text-xs sm:text-sm border backdrop-blur-md ${
+      isHandDetected
+        ? "bg-green-500/20 border-green-400/40 text-green-300"
+        : "bg-white/10 border-white/20 text-gray-300"
+    }`}
+  >
+    {isHandDetected
+      ? clicking
+        ? `🤏 Pinch Click • ${fps} FPS`
+        : `🖐 Hand Detected • ${fps} FPS`
+      : "Waiting for Hand..."}
+  </div>
+</div>
   );
 }
 

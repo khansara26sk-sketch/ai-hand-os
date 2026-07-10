@@ -27,16 +27,16 @@ function CameraCard() {
         </div>
       </div>
 
-      <div className="relative w-full aspect-video rounded-xl overflow-hidden border-2 border-cyan-400/60 bg-black/40 flex items-center justify-center">
+      <div className="relative w-full aspect-video rounded-xl overflow-hidden border-2 border-cyan-400/60 bg-black flex items-center justify-center">
         <video
-          ref={videoRef}
-          autoPlay
-          playsInline
-          muted
-          className={`w-full h-full object-cover ${
-            settings.mirrorCamera ? "scale-x-[-1]" : ""
-          }`}
-        />
+  ref={videoRef}
+  autoPlay
+  playsInline
+  muted
+  className={`absolute inset-0 w-full h-full object-contain ${
+    settings.mirrorCamera ? "scale-x-[-1]" : ""
+  }`}
+/>
 
         {isCameraOn && (
           <HandTracker

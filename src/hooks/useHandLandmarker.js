@@ -6,6 +6,37 @@ import {
 } from "../services/visionService";
 import handEngine from "../engine/HandEngine";
 
+const HAND_CONNECTIONS = [
+  [0, 1],
+  [1, 2],
+  [2, 3],
+  [3, 4],
+
+  [0, 5],
+  [5, 6],
+  [6, 7],
+  [7, 8],
+
+  [0, 9],
+  [9, 10],
+  [10, 11],
+  [11, 12],
+
+  [0, 13],
+  [13, 14],
+  [14, 15],
+  [15, 16],
+
+  [0, 17],
+  [17, 18],
+  [18, 19],
+  [19, 20],
+
+  [5, 9],
+  [9, 13],
+  [13, 17],
+];
+
 export function useHandLandmarker() {
   const canvasRef = useRef(null);
   const animationRef = useRef(null);
@@ -14,7 +45,6 @@ export function useHandLandmarker() {
   const isRunningRef = useRef(false);
   const lastTimeRef = useRef(performance.now());
 
-  // prevent unnecessary renders
   const fpsRef = useRef(0);
   const handDetectedRef = useRef(false);
 
@@ -22,143 +52,213 @@ export function useHandLandmarker() {
   const [isHandDetected, setIsHandDetected] = useState(false);
   const [fps, setFps] = useState(0);
 
-  const drawHand = useCallback((points) => {
+  const syncCanvasSize = useCallback(() => {
     const canvas = canvasRef.current;
     const video = videoRefInternal.current;
 
-    if (!canvas || !video) return;
+    if (!canvas || !video) return null;
 
-    canvas.width = video.videoWidth || video.clientWidth;
-    canvas.height = video.videoHeight || video.clientHeight;
+    const rect = video.getBoundingClientRect();
 
-    const ctx = canvas.getContext("2d");
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    const displayWidth = Math.max(1, Math.round(rect.width));
+    const displayHeight = Math.max(1, Math.round(rect.height));
 
-    if (!points) return;
+    const dpr = Math.min(window.devicePixelRatio || 1, 2);
 
-    const connections = [
-      [0, 1],[1, 2],[2, 3],[3, 4],
-      [0, 5],[5, 6],[6, 7],[7, 8],
-      [0, 9],[9,10],[10,11],[11,12],
-      [0,13],[13,14],[14,15],[15,16],
-      [0,17],[17,18],[18,19],[19,20],
-      [5,9],[9,13],[13,17],
-    ];
+    const internalWidth = Math.round(displayWidth * dpr);
+    const internalHeight = Math.round(displayHeight * dpr);
 
-    ctx.lineWidth = 4;
-    ctx.strokeStyle = "#22c55e";
+    if (
+      canvas.width !== internalWidth ||
+      canvas.height !== internalHeight
+    ) {
+      canvas.width = internalWidth;
+      canvas.height = internalHeight;
+    }
 
-    connections.forEach(([a,b])=>{
-      ctx.beginPath();
-      ctx.moveTo(points[a].x*canvas.width,points[a].y*canvas.height);
-      ctx.lineTo(points[b].x*canvas.width,points[b].y*canvas.height);
-      ctx.stroke();
-    });
+    canvas.style.width = `${displayWidth}px`;
+    canvas.style.height = `${displayHeight}px`;
 
-    ctx.fillStyle="#ef4444";
+    return {
+      displayWidth,
+      displayHeight,
+      dpr,
+    };
+  }, []);
 
-    points.forEach((p)=>{
-      ctx.beginPath();
-      ctx.arc(
-        p.x*canvas.width,
-        p.y*canvas.height,
-        5,
-        0,
-        Math.PI*2
-      );
-      ctx.fill();
-    });
+  const drawHand = useCallback(
+    (points) => {
+      const canvas = canvasRef.current;
 
-  },[]);
+      if (!canvas) return;
 
-  const loop = useCallback(()=>{
+      const size = syncCanvasSize();
+      if (!size) return;
 
-    if(!isRunningRef.current) return;
+      const { displayWidth, displayHeight, dpr } = size;
 
-    const video=videoRefInternal.current;
+      const ctx = canvas.getContext("2d");
 
-    if(!video){
-      animationRef.current=requestAnimationFrame(loop);
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      ctx.clearRect(0, 0, displayWidth, displayHeight);
+
+      if (!points || points.length < 21) return;
+
+      ctx.lineCap = "round";
+      ctx.lineJoin = "round";
+      ctx.lineWidth = Math.max(2, displayWidth / 180);
+      ctx.strokeStyle = "#22c55e";
+      ctx.shadowBlur = 4;
+      ctx.shadowColor = "rgba(34, 197, 94, 0.55)";
+
+      HAND_CONNECTIONS.forEach(([startIndex, endIndex]) => {
+        const startPoint = points[startIndex];
+        const endPoint = points[endIndex];
+
+        if (!startPoint || !endPoint) return;
+
+        ctx.beginPath();
+        ctx.moveTo(
+          startPoint.x * displayWidth,
+          startPoint.y * displayHeight
+        );
+        ctx.lineTo(
+          endPoint.x * displayWidth,
+          endPoint.y * displayHeight
+        );
+        ctx.stroke();
+      });
+
+      ctx.shadowBlur = 0;
+      ctx.fillStyle = "#ef4444";
+
+      const pointRadius = Math.max(3, displayWidth / 150);
+
+      points.forEach((point) => {
+        if (!point) return;
+
+        ctx.beginPath();
+        ctx.arc(
+          point.x * displayWidth,
+          point.y * displayHeight,
+          pointRadius,
+          0,
+          Math.PI * 2
+        );
+        ctx.fill();
+      });
+    },
+    [syncCanvasSize]
+  );
+
+  const loop = useCallback(() => {
+    if (!isRunningRef.current) return;
+
+    const video = videoRefInternal.current;
+
+    if (!video || video.readyState < 2) {
+      animationRef.current = requestAnimationFrame(loop);
       return;
     }
 
-    const now=performance.now();
+    const now = performance.now();
+    const delta = Math.max(1, now - lastTimeRef.current);
 
-    const delta=now-lastTimeRef.current;
-    lastTimeRef.current=now;
+    lastTimeRef.current = now;
 
-    const currentFPS=Math.round(1000/delta);
+    const currentFPS = Math.min(120, Math.round(1000 / delta));
 
-    // update FPS only if changed
-    if(currentFPS!==fpsRef.current){
-      fpsRef.current=currentFPS;
+    if (currentFPS !== fpsRef.current) {
+      fpsRef.current = currentFPS;
       setFps(currentFPS);
     }
 
-    const results=detectHands(video,now);
+    const results = detectHands(video, now);
 
-    handEngine.update(results,currentFPS);
+    handEngine.update(results, currentFPS);
 
-    const points=handEngine.getLandmarks();
+    const points = handEngine.getLandmarks();
+    const detected = handEngine.getHandDetected();
 
-    const detected=handEngine.getHandDetected();
-
-    // update only when detection changes
-    if(detected!==handDetectedRef.current){
-      handDetectedRef.current=detected;
+    if (detected !== handDetectedRef.current) {
+      handDetectedRef.current = detected;
       setIsHandDetected(detected);
     }
 
-    // landmarks still update every frame
     setLandmarks(points);
-
     drawHand(points);
 
-    animationRef.current=requestAnimationFrame(loop);
+    animationRef.current = requestAnimationFrame(loop);
+  }, [drawHand]);
 
-  },[drawHand]);
+  const startTracking = useCallback(
+    async (videoElement) => {
+      if (!videoElement || isRunningRef.current) return;
 
-  const startTracking=useCallback(async(videoElement)=>{
+      videoRefInternal.current = videoElement;
 
-    if(isRunningRef.current) return;
+      await initializeHandLandmarker();
 
-    videoRefInternal.current=videoElement;
+      syncCanvasSize();
 
-    await initializeHandLandmarker();
+      isRunningRef.current = true;
+      lastTimeRef.current = performance.now();
 
-    isRunningRef.current=true;
+      animationRef.current = requestAnimationFrame(loop);
+    },
+    [loop, syncCanvasSize]
+  );
 
-    lastTimeRef.current=performance.now();
+  const stopTracking = useCallback(() => {
+    isRunningRef.current = false;
 
-    animationRef.current=requestAnimationFrame(loop);
-
-  },[loop]);
-
-  const stopTracking=useCallback(()=>{
-
-    isRunningRef.current=false;
-
-    if(animationRef.current){
+    if (animationRef.current) {
       cancelAnimationFrame(animationRef.current);
-      animationRef.current=null;
+      animationRef.current = null;
     }
 
-    drawHand(null);
+    const canvas = canvasRef.current;
+
+    if (canvas) {
+      const ctx = canvas.getContext("2d");
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+    }
+
+    videoRefInternal.current = null;
+
+    fpsRef.current = 0;
+    handDetectedRef.current = false;
 
     setLandmarks(null);
     setIsHandDetected(false);
     setFps(0);
 
-  },[drawHand]);
+    handEngine.reset();
+  }, []);
 
-  useEffect(()=>{
-    return ()=>{
+  useEffect(() => {
+    const handleResize = () => {
+      syncCanvasSize();
+      drawHand(handEngine.getLandmarks());
+    };
+
+    window.addEventListener("resize", handleResize);
+    window.addEventListener("orientationchange", handleResize);
+
+    return () => {
+      window.removeEventListener("resize", handleResize);
+      window.removeEventListener("orientationchange", handleResize);
+    };
+  }, [drawHand, syncCanvasSize]);
+
+  useEffect(() => {
+    return () => {
       stopTracking();
       closeHandLandmarker();
     };
-  },[stopTracking]);
+  }, [stopTracking]);
 
-  return{
+  return {
     canvasRef,
     landmarks,
     isHandDetected,
