@@ -19,6 +19,17 @@ function AirCanvas() {
   const [tool, setTool] = useState("brush");
   const [historyCount, setHistoryCount] = useState(0);
   const [redoCount, setRedoCount] = useState(0);
+  const toolsScrollRef = useRef(null);
+
+const scrollTools = (direction) => {
+  const container = toolsScrollRef.current;
+  if (!container) return;
+
+  container.scrollBy({
+    left: direction === "right" ? 220 : -220,
+    behavior: "smooth",
+  });
+};
 
   const colors = [
     "#22d3ee",
@@ -522,34 +533,63 @@ function AirCanvas() {
             Tools
           </p>
 
-          <div className="flex gap-2 overflow-x-auto pb-1">
-            {[
-              ["brush", "Brush"],
-              ["eraser", "Eraser"],
-              ["line", "Line"],
-              ["rectangle", "Rectangle"],
-              ["square", "Square"],
-              ["circle", "Circle"],
-              ["ellipse", "Oval"],
-              ["triangle", "Triangle"],
-            ].map(([value, label]) => (
-              <button
-                type="button"
-                key={value}
-                data-ai-clickable="true"
-                onClick={() => changeTool(value)}
-                className={`min-h-10 shrink-0 rounded-xl border px-3 sm:px-4 py-2 text-sm transition active:scale-[0.98] ${
-                  tool === value
-                    ? value === "eraser"
-                      ? "border-red-300 bg-red-500/30 text-red-200"
-                      : "border-cyan-300 bg-cyan-500/30 text-cyan-200"
-                    : "border-white/10 bg-white/10 text-white"
-                }`}
-              >
-                {label}
-              </button>
-            ))}
+          <div className="flex items-center gap-2">
+            <button
+              type="button"
+              aria-label="Scroll tools left"
+              onClick={() => scrollTools("left")}
+              className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-white/10 bg-white/10 text-xl text-cyan-300 transition active:scale-95 md:hidden"
+            >
+              ‹
+            </button>
+
+            <div
+              ref={toolsScrollRef}
+              className="min-w-0 flex-1 overflow-x-auto scroll-smooth pb-1 no-scrollbar touch-scroll"
+            >
+              <div className="flex w-max gap-2 pr-2">
+                {[
+                  ["brush", "Brush"],
+                  ["eraser", "Eraser"],
+                  ["line", "Line"],
+                  ["rectangle", "Rectangle"],
+                  ["square", "Square"],
+                  ["circle", "Circle"],
+                  ["ellipse", "Oval"],
+                  ["triangle", "Triangle"],
+                ].map(([value, label]) => (
+                  <button
+                    type="button"
+                    key={value}
+                    data-ai-clickable="true"
+                    onClick={() => changeTool(value)}
+                    className={`min-h-10 shrink-0 rounded-xl border px-3 sm:px-4 py-2 text-sm transition active:scale-[0.98] ${
+                      tool === value
+                        ? value === "eraser"
+                          ? "border-red-300 bg-red-500/30 text-red-200"
+                          : "border-cyan-300 bg-cyan-500/30 text-cyan-200"
+                        : "border-white/10 bg-white/10 text-white"
+                    }`}
+                  >
+                    {label}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            <button
+              type="button"
+              aria-label="Scroll tools right"
+              onClick={() => scrollTools("right")}
+              className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-white/10 bg-white/10 text-xl text-cyan-300 transition active:scale-95 md:hidden"
+            >
+              ›
+            </button>
           </div>
+
+          <p className="mt-2 text-center text-[11px] text-gray-500 md:hidden">
+            Swipe or use the arrows to view every tool
+          </p>
         </div>
       </div>
 
