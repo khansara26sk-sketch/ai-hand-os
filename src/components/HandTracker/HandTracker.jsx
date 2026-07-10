@@ -78,7 +78,7 @@ function HandTracker({ videoRef, enableCursor = false, mirrorMode = true }) {
       }
     }
 
-    scrollController.update(gesture, cursorPosition, clickState);
+    scrollController.update(landmarks);
     volumeController.update(gesture, landmarks);
     brightnessController.update(gesture, landmarks);
     presentationController.update(gesture, cursorPosition);
@@ -95,11 +95,11 @@ function HandTracker({ videoRef, enableCursor = false, mirrorMode = true }) {
   className="absolute inset-0 pointer-events-none z-10 overflow-hidden"
 >
   <canvas
-    ref={canvasRef}
-    className={`absolute inset-0 w-full h-full object-contain ${
-      settings.showLandmarks ? "opacity-100" : "opacity-0"
-    } ${mirrorMode ? "scale-x-[-1]" : ""}`}
-  />
+  ref={canvasRef}
+  className={`absolute inset-0 w-full h-full ${
+    settings.showLandmarks ? "opacity-100" : "opacity-0"
+  } ${mirrorMode ? "scale-x-[-1]" : ""}`}
+/>
 
   {enableCursor && isHandDetected && (
     <VirtualCursor

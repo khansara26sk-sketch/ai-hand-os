@@ -25,8 +25,8 @@ function AppLayout() {
 
   return (
     <div
-      className={`min-h-screen min-h-[100dvh] bg-[#070b16] text-white flex theme-${activeTheme}`}
-    >
+  className={`h-screen h-[100dvh] overflow-hidden bg-[#070b16] text-white flex theme-${activeTheme}`}
+>
       {/* Global HUD overlays */}
       <VolumeHUD
         visible={Boolean(volumeHUD?.visible)}
@@ -56,9 +56,12 @@ function AppLayout() {
       <div className="flex-1 min-w-0 flex flex-col pb-20 md:pb-0">
         <Navbar />
 
-        <main className="flex-1 min-w-0 overflow-y-auto overflow-x-hidden p-4 sm:p-5 md:p-6">
-          <Outlet />
-        </main>
+        <main
+  data-ai-scroll-container="true"
+  className="flex-1 min-h-0 min-w-0 overflow-y-auto overflow-x-hidden p-4 sm:p-5 md:p-6"
+>
+  <Outlet />
+</main>
 
         <StatusBar />
       </div>

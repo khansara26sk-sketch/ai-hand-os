@@ -33,7 +33,7 @@ function CameraCard() {
   autoPlay
   playsInline
   muted
-  className={`absolute inset-0 w-full h-full object-contain ${
+  className={`absolute inset-0 w-full h-full object-cover ${
     settings.mirrorCamera ? "scale-x-[-1]" : ""
   }`}
 />
