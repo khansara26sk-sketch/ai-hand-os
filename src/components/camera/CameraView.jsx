@@ -51,7 +51,19 @@ function CameraCard() {
         <button
           id="ai-test-click"
           data-ai-clickable="true"
-          className="absolute bottom-4 md:bottom-6 left-1/2 -translate-x-1/2 z-[9999] px-5 md:px-8 py-2.5 md:py-3 rounded-xl bg-cyan-500 text-white text-sm md:text-base pointer-events-auto"
+          className="
+  absolute
+  bottom-4 left-1/2 -translate-x-1/2
+  z-[9999]
+  px-4 py-2
+  text-sm
+  rounded-xl
+  bg-cyan-500 text-white
+  pointer-events-auto
+  transition
+  sm:px-5 sm:py-2.5 sm:text-base
+  md:bottom-6 md:px-8 md:py-3 md:text-lg
+"
           onClick={() => alert("BUTTON CLICKED")}
         >
           Test Click

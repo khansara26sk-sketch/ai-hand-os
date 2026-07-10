@@ -40,7 +40,19 @@ function DragBox() {
       onMouseDown={handleMouseDown}
       onMouseMove={handleMouseMove}
       onMouseUp={handleMouseUp}
-      className="absolute z-[10000] bg-purple-600 text-white px-8 py-4 rounded-xl cursor-grab select-none"
+      className="
+  absolute
+  top-4 left-1/2 -translate-x-1/2
+  z-[9999]
+  px-4 py-2
+  text-sm
+  rounded-xl
+  bg-purple-600 text-white
+  font-semibold
+  pointer-events-auto
+  sm:px-5 sm:py-2.5 sm:text-base
+  md:px-8 md:py-3 md:text-xl
+"
       style={{
         left: "100px",
         top: "80px",
