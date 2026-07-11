@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from "react";
+
 import voiceCommandController from "../../voice/VoiceCommandController";
 import useVoiceCommand from "../../hooks/useVoiceCommand";
 import useAppSettings from "../../hooks/useAppSettings";
@@ -26,13 +27,6 @@ function VoiceHUD() {
     top: 0,
   });
 
-  const stopDrag = useCallback(() => {
-    draggingRef.current = false;
-
-    window.removeEventListener("mousemove", handleDrag);
-    window.removeEventListener("mouseup", stopDrag);
-  }, []);
-
   const handleDrag = useCallback((event) => {
     if (!draggingRef.current) return;
 
@@ -45,7 +39,7 @@ function VoiceHUD() {
       (event.clientY - startRef.current.y);
 
     const maxX = Math.max(12, window.innerWidth - 304);
-    const maxY = Math.max(12, window.innerHeight - 250);
+    const maxY = Math.max(12, window.innerHeight - 260);
 
     setPosition({
       x: Math.min(Math.max(12, nextX), maxX),
@@ -53,23 +47,33 @@ function VoiceHUD() {
     });
   }, []);
 
-  const startDrag = (event) => {
-    if (window.innerWidth < 768) return;
+  const stopDrag = useCallback(() => {
+    draggingRef.current = false;
 
-    event.preventDefault();
+    window.removeEventListener("mousemove", handleDrag);
+    window.removeEventListener("mouseup", stopDrag);
+  }, [handleDrag]);
 
-    draggingRef.current = true;
+  const startDrag = useCallback(
+    (event) => {
+      if (window.innerWidth < 768) return;
 
-    startRef.current = {
-      x: event.clientX,
-      y: event.clientY,
-      left: position.x,
-      top: position.y,
-    };
+      event.preventDefault();
 
-    window.addEventListener("mousemove", handleDrag);
-    window.addEventListener("mouseup", stopDrag);
-  };
+      draggingRef.current = true;
+
+      startRef.current = {
+        x: event.clientX,
+        y: event.clientY,
+        left: position.x,
+        top: position.y,
+      };
+
+      window.addEventListener("mousemove", handleDrag);
+      window.addEventListener("mouseup", stopDrag);
+    },
+    [handleDrag, position.x, position.y, stopDrag]
+  );
 
   useEffect(() => {
     const handleResize = () => {
@@ -80,7 +84,7 @@ function VoiceHUD() {
         ),
         y: Math.min(
           Math.max(12, current.y),
-          Math.max(12, window.innerHeight - 250)
+          Math.max(12, window.innerHeight - 260)
         ),
       }));
     };
@@ -92,9 +96,10 @@ function VoiceHUD() {
     };
   }, []);
 
+  
+
   useEffect(() => {
     const handleCommandComplete = () => {
-      // Command execute hone ke baad panel automatically close
       setPanelOpen(false);
     };
 
@@ -136,22 +141,24 @@ function VoiceHUD() {
 
   return (
     <>
-      {/* Dark background on mobile only */}
       {panelOpen && (
-        <button
-          type="button"
-          aria-label="Close voice assistant"
-          onClick={closePanel}
-          className="md:hidden fixed inset-0 z-[999990] bg-black/40"
+        <div
+          aria-hidden="true"
+          className="
+            fixed inset-0 z-[999990]
+            bg-black/40
+            pointer-events-none
+            md:hidden
+          "
         />
       )}
 
-      {/* Voice Assistant Panel */}
       {panelOpen && (
         <div
           className="
             fixed z-[999999]
             left-3 right-3 bottom-24
+            pointer-events-auto
             md:left-auto md:right-auto md:bottom-auto
           "
           style={
@@ -166,27 +173,26 @@ function VoiceHUD() {
           }
         >
           <div
-            className={`w-full md:w-72 rounded-2xl border backdrop-blur-xl shadow-2xl overflow-hidden ${
+            className={`w-full overflow-hidden rounded-2xl border shadow-2xl backdrop-blur-xl md:w-72 ${
               voice.listening
-                ? "bg-green-950/95 border-green-400/40"
-                : "bg-black/90 border-white/10"
+                ? "border-green-400/40 bg-green-950/95"
+                : "border-white/10 bg-black/90"
             }`}
           >
             <div
-              data-ai-clickable="true"
               onMouseDown={startDrag}
               className="
-                px-4 py-3 bg-white/10
                 flex items-center justify-between
+                bg-white/10 px-4 py-3
                 select-none md:cursor-move
               "
             >
-              <span className="text-white font-semibold">
+              <span className="font-semibold text-white">
                 🎤 Voice Assistant
               </span>
 
               <div className="flex items-center gap-3">
-                <span className="hidden md:inline text-xs text-gray-400">
+                <span className="hidden text-xs text-gray-400 md:inline">
                   Drag
                 </span>
 
@@ -194,12 +200,19 @@ function VoiceHUD() {
                   type="button"
                   data-ai-clickable="true"
                   aria-label="Close voice assistant"
-                  onMouseDown={(event) => event.stopPropagation()}
+                  onMouseDown={(event) => {
+                    event.stopPropagation();
+                  }}
                   onClick={closePanel}
                   className="
-                    w-8 h-8 min-h-0 rounded-lg
-                    bg-white/10 text-gray-300
+                    relative z-20
+                    h-8 min-h-0 w-8
+                    rounded-lg bg-white/10
+                    text-gray-300
+                    pointer-events-auto
+                    transition
                     hover:bg-white/20
+                    active:scale-95
                   "
                 >
                   ✕
@@ -212,10 +225,10 @@ function VoiceHUD() {
                 type="button"
                 data-ai-clickable="true"
                 onClick={toggleListening}
-                className={`w-full py-3 rounded-xl font-semibold transition ${
+                className={`relative z-20 w-full rounded-xl py-3 font-semibold pointer-events-auto transition active:scale-[0.98] ${
                   voice.listening
                     ? "bg-green-500 text-white"
-                    : "bg-cyan-500 hover:bg-cyan-400 text-white"
+                    : "bg-cyan-500 text-white hover:bg-cyan-400"
                 }`}
               >
                 {voice.listening
@@ -228,7 +241,7 @@ function VoiceHUD() {
               </p>
 
               {voice.transcript && (
-                <div className="mt-3 rounded-xl bg-black/30 p-3 text-sm text-cyan-300 break-words">
+                <div className="mt-3 break-words rounded-xl bg-black/30 p-3 text-sm text-cyan-300">
                   “{voice.transcript}”
                 </div>
               )}
@@ -237,7 +250,6 @@ function VoiceHUD() {
         </div>
       )}
 
-      {/* Small microphone button */}
       {!panelOpen && (
         <button
           type="button"
@@ -247,16 +259,18 @@ function VoiceHUD() {
           className={`
             fixed z-[999999]
             right-4 bottom-24
-            md:right-8 md:bottom-8
-            w-14 h-14 min-h-0
+            flex h-14 min-h-0 w-14
+            items-center justify-center
             rounded-full border
-            flex items-center justify-center
-            text-2xl shadow-[0_0_30px_rgba(34,211,238,0.35)]
+            text-2xl
+            pointer-events-auto
+            shadow-[0_0_30px_rgba(34,211,238,0.35)]
             transition active:scale-95
+            md:right-8 md:bottom-8
             ${
               voice.listening
-                ? "bg-green-500 border-green-300 animate-pulse"
-                : "bg-cyan-500 border-cyan-300"
+                ? "animate-pulse border-green-300 bg-green-500"
+                : "border-cyan-300 bg-cyan-500"
             }
           `}
         >

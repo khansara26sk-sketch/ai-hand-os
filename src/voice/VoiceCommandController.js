@@ -52,8 +52,12 @@ class VoiceCommandController {
         this.message = `Voice error: ${event.error}`;
       }
 
-      if (event.error === "not-allowed") {
+      if (
+        event.error === "not-allowed" ||
+        event.error === "service-not-allowed"
+      ) {
         this.listening = false;
+        this.isStopping = false;
         this.message = "Microphone permission denied";
       }
 
@@ -61,11 +65,6 @@ class VoiceCommandController {
     };
 
     this.recognition.onend = () => {
-      /*
-        Restart only when listening is intentionally active.
-        After a command, finishCommand() sets listening to false,
-        so recognition will not restart.
-      */
       if (this.listening && !this.isStopping) {
         try {
           this.recognition.start();
@@ -102,8 +101,24 @@ class VoiceCommandController {
   }
 
   navigate(path) {
-    window.location.hash = path;
+  const normalizedPath = path.startsWith("/")
+    ? path
+    : `/${path}`;
+
+  const nextHash = `#${normalizedPath}`;
+
+  if (window.location.hash === nextHash) {
+    window.location.reload();
+    return;
   }
+
+  window.location.hash = nextHash;
+
+  // Force HashRouter to render the correct page immediately
+  window.setTimeout(() => {
+    window.location.reload();
+  }, 50);
+}
 
   start() {
     if (!this.recognition) {
@@ -121,6 +136,7 @@ class VoiceCommandController {
       this.recognition.start();
     } catch (error) {
       this.listening = false;
+      this.isStopping = false;
       this.message = "Unable to start voice recognition";
       this.emitUpdate();
 
@@ -146,6 +162,7 @@ class VoiceCommandController {
       this.recognition.stop();
     } catch {
       this.isStopping = false;
+      this.emitUpdate();
     }
   }
 
@@ -159,11 +176,6 @@ class VoiceCommandController {
 
   finishCommand(message) {
     this.message = message;
-
-    /*
-      Set listening false before stopping recognition.
-      Otherwise onend could restart it.
-    */
     this.listening = false;
     this.isStopping = true;
 
@@ -179,7 +191,13 @@ class VoiceCommandController {
       this.recognition.stop();
     } catch {
       this.isStopping = false;
+      this.emitUpdate();
     }
+  }
+
+  openPage(path, message) {
+    this.navigate(path);
+    this.finishCommand(message);
   }
 
   handleCommand(text) {
@@ -189,8 +207,7 @@ class VoiceCommandController {
       text.includes("go to dashboard") ||
       text.includes("go home")
     ) {
-      this.navigate("/");
-      this.finishCommand("Opening dashboard");
+      this.openPage("/", "Opening dashboard");
       return;
     }
 
@@ -198,8 +215,7 @@ class VoiceCommandController {
       text.includes("open mouse") ||
       text.includes("go to mouse")
     ) {
-      this.navigate("/mouse");
-      this.finishCommand("Opening mouse");
+      this.openPage("/mouse", "Opening mouse");
       return;
     }
 
@@ -207,8 +223,7 @@ class VoiceCommandController {
       text.includes("open keyboard") ||
       text.includes("go to keyboard")
     ) {
-      this.navigate("/keyboard");
-      this.finishCommand("Opening keyboard");
+      this.openPage("/keyboard", "Opening keyboard");
       return;
     }
 
@@ -216,8 +231,7 @@ class VoiceCommandController {
       text.includes("open canvas") ||
       text.includes("go to canvas")
     ) {
-      this.navigate("/canvas");
-      this.finishCommand("Opening canvas");
+      this.openPage("/canvas", "Opening canvas");
       return;
     }
 
@@ -225,8 +239,7 @@ class VoiceCommandController {
       text.includes("open settings") ||
       text.includes("go to settings")
     ) {
-      this.navigate("/settings");
-      this.finishCommand("Opening settings");
+      this.openPage("/settings", "Opening settings");
       return;
     }
 
@@ -234,8 +247,15 @@ class VoiceCommandController {
       text.includes("open about") ||
       text.includes("go to about")
     ) {
-      this.navigate("/about");
-      this.finishCommand("Opening about");
+      this.openPage("/about", "Opening about");
+      return;
+    }
+
+    if (
+      text.includes("open desktop") ||
+      text.includes("go to desktop")
+    ) {
+      this.openPage("/desktop", "Opening desktop");
       return;
     }
 
@@ -244,8 +264,10 @@ class VoiceCommandController {
       text.includes("start presentation") ||
       text.includes("go to presentation")
     ) {
-      this.navigate("/presentation-demo");
-      this.finishCommand("Opening presentation");
+      this.openPage(
+        "/presentation-demo",
+        "Opening presentation"
+      );
       return;
     }
 
@@ -255,6 +277,32 @@ class VoiceCommandController {
       if (canvasApi?.clear) {
         canvasApi.clear();
         this.finishCommand("Canvas cleared");
+      } else {
+        this.finishCommand("Canvas is not open");
+      }
+
+      return;
+    }
+
+    if (text.includes("undo canvas") || text === "undo") {
+      const canvasApi = window.__AIR_CANVAS__;
+
+      if (canvasApi?.undo) {
+        canvasApi.undo();
+        this.finishCommand("Canvas action undone");
+      } else {
+        this.finishCommand("Canvas is not open");
+      }
+
+      return;
+    }
+
+    if (text.includes("redo canvas") || text === "redo") {
+      const canvasApi = window.__AIR_CANVAS__;
+
+      if (canvasApi?.redo) {
+        canvasApi.redo();
+        this.finishCommand("Canvas action restored");
       } else {
         this.finishCommand("Canvas is not open");
       }

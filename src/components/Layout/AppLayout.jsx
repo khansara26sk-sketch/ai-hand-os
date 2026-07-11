@@ -15,6 +15,7 @@ import useBrightnessHUD from "../../hooks/useBrightnessHUD";
 import useScreenshotHUD from "../../hooks/useScreenshotHUD";
 import useAppSettings from "../../hooks/useAppSettings";
 
+
 function AppLayout() {
   const volumeHUD = useVolumeHUD();
   const brightnessHUD = useBrightnessHUD();
@@ -28,6 +29,7 @@ function AppLayout() {
   className={`h-screen h-[100dvh] overflow-hidden bg-[#070b16] text-white flex theme-${activeTheme}`}
 >
       {/* Global HUD overlays */}
+      
       <VolumeHUD
         visible={Boolean(volumeHUD?.visible)}
         volume={volumeHUD?.volume ?? 50}
